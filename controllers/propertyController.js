@@ -1,15 +1,18 @@
 const Property = require('../models/Property');
 
-exports.getAllProperties = async (req, res, next) => {
+// Get all properties
+exports.getAllProperties = async (req, res) => {
   try {
     const properties = await Property.find();
     res.status(200).json(properties);
   } catch (err) {
-    next(err);
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-exports.getPropertyById = async (req, res, next) => {
+// Get property by ID
+exports.getPropertyById = async (req, res) => {
   try {
     const property = await Property.findById(req.params.id);
     if (!property) {
@@ -17,11 +20,13 @@ exports.getPropertyById = async (req, res, next) => {
     }
     res.status(200).json(property);
   } catch (err) {
-    next(err);
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-exports.createProperty = async (req, res, next) => {
+// Create a new property
+exports.createProperty = async (req, res) => {
   try {
     const property = new Property({
       ...req.body,
@@ -30,11 +35,13 @@ exports.createProperty = async (req, res, next) => {
     const createdProperty = await property.save();
     res.status(201).json(createdProperty);
   } catch (err) {
-    next(err);
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-exports.updateProperty = async (req, res, next) => {
+// Update a property
+exports.updateProperty = async (req, res) => {
   try {
     const property = await Property.findById(req.params.id);
     if (!property) {
@@ -45,18 +52,16 @@ exports.updateProperty = async (req, res, next) => {
       return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    const updatedProperty = await Property.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
+    const updatedProperty = await Property.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.status(200).json(updatedProperty);
   } catch (err) {
-    next(err);
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-exports.deleteProperty = async (req, res, next) => {
+// Delete a property
+exports.deleteProperty = async (req, res) => {
   try {
     const property = await Property.findById(req.params.id);
     if (!property) {
@@ -70,6 +75,7 @@ exports.deleteProperty = async (req, res, next) => {
     await property.remove();
     res.status(200).json({ message: 'Property deleted' });
   } catch (err) {
-    next(err);
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
   }
 };

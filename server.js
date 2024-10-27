@@ -1,25 +1,30 @@
 const express = require('express');
-const app = express();
+const cors = require('cors');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const propertyRoutes = require('./routes/propertyRoutes');
-const userRoutes = require('./routes/userRoutes');
-const bookingRoutes = require('./routes/bookingRoutes'); // Corrected import
+const bookingRoutes = require('./routes/bookingRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const errorHandler = require('./middleware/errorMiddleware');
-require('dotenv').config(); // Correct import for dotenv
+require('dotenv').config();
 
-// Connect to MongoDB
+const app = express();
+
 connectDB();
 
-// Middleware
+app.use(cors());
 app.use(express.json());
+
+// Optional logging middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/properties', propertyRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/bookings', bookingRoutes); // Corrected route
+app.use('/api/bookings', bookingRoutes);
 app.use('/api/reviews', reviewRoutes);
 
 // Error Handling
