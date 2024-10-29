@@ -1,39 +1,37 @@
 const Review = require('../models/Review');
-const Property = require('../models/Property');
 
-// Get reviews for a specific property
-const getReviews = async (req, res) => {
-  try {
-    const reviews = await Review.find({ property: req.params.propertyId }).populate('user', 'name');
-    res.status(200).json(reviews);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
-
-// Create a new review for a property
+// Create a new review
 const createReview = async (req, res) => {
-  const { text, rating } = req.body;
   try {
-    const property = await Property.findById(req.params.propertyId);
-    if (!property) {
-      return res.status(404).json({ message: 'Property not found' });
-    }
-
+    const { propertyId } = req.params;
+    const { text, rating } = req.body;
     const review = new Review({
+      property: propertyId,
+      user: req.user._id,
       text,
-      rating,
-      property: req.params.propertyId,
-      user: req.user.id,
+      rating
     });
-
     await review.save();
     res.status(201).json(review);
   } catch (error) {
-    console.error(error);
+    console.error('Error creating review:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
 
-module.exports = { getReviews, createReview };
+// Get reviews for a specific property
+const getReviewsForProperty = async (req, res) => {
+  try {
+    const { propertyId } = req.params;
+    const reviews = await Review.find({ property: propertyId }).populate('user');
+    res.status(200).json(reviews);
+  } catch (error) {
+    console.error('Error fetching reviews:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+module.exports = {
+  createReview,
+  getReviewsForProperty
+};

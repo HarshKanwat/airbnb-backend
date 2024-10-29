@@ -55,7 +55,18 @@ const loginUser = async (req, res) => {
   }
 };
 
+// Function to logout a user
+const logoutUser = (req, res) => {
+  try {
+    res.status(200).json({ message: 'User logged out successfully' });
+  } catch (error) {
+    console.error('Error during logout:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
+  logoutUser,
 };

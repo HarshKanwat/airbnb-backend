@@ -5,13 +5,11 @@ const Property = require('../models/Property');
 exports.createBooking = async (req, res, next) => {
   try {
     const { property, startDate, endDate, totalPrice } = req.body;
-
     // Check if the property exists
     const propertyExists = await Property.findById(property);
     if (!propertyExists) {
       return res.status(404).json({ message: 'Property not found' });
     }
-
     // Create a new booking
     const booking = new Booking({
       property,
@@ -20,11 +18,11 @@ exports.createBooking = async (req, res, next) => {
       endDate,
       totalPrice,
     });
-
     const createdBooking = await booking.save();
     res.status(201).json(createdBooking);
   } catch (err) {
-    next(err);
+    console.error('Error creating booking:', err);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -34,7 +32,8 @@ exports.getUserBookings = async (req, res, next) => {
     const bookings = await Booking.find({ user: req.params.userId }).populate('property');
     res.status(200).json(bookings);
   } catch (err) {
-    next(err);
+    console.error('Error fetching user bookings:', err);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -44,7 +43,8 @@ exports.getPropertyBookings = async (req, res, next) => {
     const bookings = await Booking.find({ property: req.params.propertyId });
     res.status(200).json(bookings);
   } catch (err) {
-    next(err);
+    console.error('Error fetching property bookings:', err);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -55,16 +55,15 @@ exports.cancelBooking = async (req, res, next) => {
     if (!booking) {
       return res.status(404).json({ message: 'Booking not found' });
     }
-
     // Check if the user is authorized to cancel the booking
     if (booking.user.toString() !== req.user.id) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
-
     booking.status = 'cancelled';
     await booking.save();
     res.status(200).json({ message: 'Booking cancelled' });
   } catch (err) {
-    next(err);
+    console.error('Error cancelling booking:', err);
+    res.status(500).json({ message: 'Server error' });
   }
 };

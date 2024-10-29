@@ -47,11 +47,9 @@ exports.updateProperty = async (req, res) => {
     if (!property) {
       return res.status(404).json({ message: 'Property not found' });
     }
-
     if (property.owner.toString() !== req.user.id) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
-
     const updatedProperty = await Property.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.status(200).json(updatedProperty);
   } catch (err) {
@@ -67,11 +65,9 @@ exports.deleteProperty = async (req, res) => {
     if (!property) {
       return res.status(404).json({ message: 'Property not found' });
     }
-
     if (property.owner.toString() !== req.user.id) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
-
     await property.remove();
     res.status(200).json({ message: 'Property deleted' });
   } catch (err) {
