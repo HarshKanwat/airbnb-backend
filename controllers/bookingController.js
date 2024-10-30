@@ -26,10 +26,10 @@ exports.createBooking = async (req, res, next) => {
   }
 };
 
-// Get bookings for a specific user
+// Get bookings for the authenticated user
 exports.getUserBookings = async (req, res, next) => {
   try {
-    const bookings = await Booking.find({ user: req.params.userId }).populate('property');
+    const bookings = await Booking.find({ user: req.user.id }).populate('property');
     res.status(200).json(bookings);
   } catch (err) {
     console.error('Error fetching user bookings:', err);
@@ -47,23 +47,21 @@ exports.getPropertyBookings = async (req, res, next) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-
 // Cancel a booking
-exports.cancelBooking = async (req, res, next) => {
+exports.cancelBooking = async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id);
     if (!booking) {
       return res.status(404).json({ message: 'Booking not found' });
     }
-    // Check if the user is authorized to cancel the booking
-    if (booking.user.toString() !== req.user.id) {
+    if (booking.user.toString() !== req.user.id) { // Assuming you have a user reference
       return res.status(401).json({ message: 'Unauthorized' });
     }
-    booking.status = 'cancelled';
-    await booking.save();
-    res.status(200).json({ message: 'Booking cancelled' });
+
+    await booking.remove();
+    res.status(200).json({ message: 'Booking canceled successfully' });
   } catch (err) {
-    console.error('Error cancelling booking:', err);
+    console.error(err);
     res.status(500).json({ message: 'Server error' });
   }
 };
