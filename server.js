@@ -14,7 +14,7 @@ const app = express();
 connectDB();
 
 const corsOptions = {
-  origin: 'https://sensational-kangaroo-e59a30.netlify.app',
+  origin: 'https://lambent-starburst-3d4c23.netlify.app',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
 };
